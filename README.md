@@ -1,2 +1,2 @@
-# CodeBlockTimer-Python
+# CodeBlockTimer for Python
  
