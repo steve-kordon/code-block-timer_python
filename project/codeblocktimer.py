@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import threading
 import time
+from contextlib import AbstractContextManager
 
 
 def get() -> CodeBlockTimer:
@@ -23,14 +24,8 @@ class CodeBlockTimer:
     The code block timer
     """
 
-    instances: list[_CodeBlockTimerInstance]
-    active_instance: _CodeBlockTimerInstance
-
-    def __init__(self):
-        """
-        Creates a new code block timer.
-        """
-        self.instances = list()
+    instances: list[_CodeBlockTimerInstance] = list()
+    active_instance: _CodeBlockTimerInstance = None
 
     def start(self, name: str) -> CodeBlockTimerCloseable:
         """
@@ -105,7 +100,7 @@ class CodeBlockTimer:
         return self_string
 
 
-class CodeBlockTimerCloseable:
+class CodeBlockTimerCloseable(AbstractContextManager["CodeBlockTimerCloseable"]):
     """
     The code block timer closeable.
     """
@@ -147,7 +142,7 @@ class _CodeBlockTimerInstance:
     start_time: int
     stop_time: int
     parent_instance: _CodeBlockTimerInstance
-    child_instances: list[_CodeBlockTimerInstance]
+    child_instances: list[_CodeBlockTimerInstance] = None
 
     def __init__(self, name: str, parent_instance: _CodeBlockTimerInstance):
         """
@@ -161,7 +156,7 @@ class _CodeBlockTimerInstance:
         self.parent_instance = parent_instance
 
         if self.parent_instance is not None:
-            self.parent_instance.child_instances.append(self)
+            self.parent_instance.add_child_instance(self)
 
         self.start_time = round(time.time() * 1000.0)
 
