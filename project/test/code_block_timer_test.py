@@ -1,7 +1,7 @@
 import threading
 import time
 
-import project.codeblocktimer as cbt
+import project.code_block_timer as cbt
 
 
 def test() -> None:
